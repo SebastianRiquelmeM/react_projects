@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { Error } from "./Error";
 
-export const Formulario = ({ pacientes, setPacientes, paciente }) => {
+export const Formulario = ({ pacientes, setPacientes, paciente, setPaciente }) => {
 	const [nombre, setNombre] = useState("");
 	const [propietario, setPropietario] = useState("");
 	const [email, setEmail] = useState("");
@@ -10,6 +10,16 @@ export const Formulario = ({ pacientes, setPacientes, paciente }) => {
 	const [sintomas, setSintomas] = useState("");
 
 	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		if (Object.keys(paciente).length > 0) {
+			setNombre(paciente.nombre);
+			setPropietario(paciente.propietario);
+			setEmail(paciente.email);
+			setFecha(paciente.fecha);
+			setSintomas(paciente.sintomas);
+		}
+	}, [paciente]);
 
 	const generarId = () => {
 		const random = Math.random().toString(36).substr(2);
@@ -22,7 +32,7 @@ export const Formulario = ({ pacientes, setPacientes, paciente }) => {
 
 		// Valdiación del formulario
 		if ([nombre, propietario, email, fecha, sintomas].includes("")) {
-			console.log("Todos los campos son obligatorios");
+			/* console.log("Todos los campos son obligatorios"); */
 			setError(true);
 			return;
 		}
@@ -34,12 +44,30 @@ export const Formulario = ({ pacientes, setPacientes, paciente }) => {
 			propietario,
 			email,
 			fecha,
-			sintomas,
-			id: generarId(),
+			sintomas
 		};
 
-		//Agrega el nuevo paciente al state de pacientes (App.js)
-		setPacientes([...pacientes, objetoPaciente]);
+		if (paciente.id) {
+			//Editando registro
+			objetoPaciente.id = paciente.id;
+
+			const pacientesActualizados = pacientes.map((pacienteState) => {
+				if (pacienteState.id === paciente.id) {
+					return objetoPaciente;
+				}
+				return pacienteState;
+			});
+
+			setPacientes(pacientesActualizados);
+			setPaciente({});
+			
+		} else {
+			// Nuevo registro
+			objetoPaciente.id = generarId();
+
+			//Agrega el nuevo paciente al state de pacientes (App.js)
+			setPacientes([...pacientes, objetoPaciente]);
+		}
 
 		// Reiniciar el formulario
 		setNombre("");
@@ -149,7 +177,7 @@ export const Formulario = ({ pacientes, setPacientes, paciente }) => {
 					type="submit"
 					className="bg-indigo-600 w-full p-3 text-white uppercase font-bold
 					hover:bg-indigo-700 rounded-md cursor-pointer transition-all"
-					value="Agregar Paciente"
+					value={paciente.id ? "Editar Paciente" : "Agregar Paciente"}
 				></input>
 			</form>
 		</div>
