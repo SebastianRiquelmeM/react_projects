@@ -1,8 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Error } from "./Error"
+import { Error } from "./Error";
 
-export const Formulario = ({ pacientes, setPacientes }) => {
+export const Formulario = ({ pacientes, setPacientes, paciente }) => {
 	const [nombre, setNombre] = useState("");
 	const [propietario, setPropietario] = useState("");
 	const [email, setEmail] = useState("");
@@ -10,6 +10,12 @@ export const Formulario = ({ pacientes, setPacientes }) => {
 	const [sintomas, setSintomas] = useState("");
 
 	const [error, setError] = useState(false);
+
+	const generarId = () => {
+		const random = Math.random().toString(36).substr(2);
+		const fecha = Date.now().toString(36);
+		return random + fecha;
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -19,7 +25,7 @@ export const Formulario = ({ pacientes, setPacientes }) => {
 			console.log("Todos los campos son obligatorios");
 			setError(true);
 			return;
-		} 
+		}
 		setError(false);
 
 		// Objeto de paciente
@@ -29,9 +35,10 @@ export const Formulario = ({ pacientes, setPacientes }) => {
 			email,
 			fecha,
 			sintomas,
+			id: generarId(),
 		};
 
-		//Agrega el nuevo paciente al state de pacientes (App.js) 
+		//Agrega el nuevo paciente al state de pacientes (App.js)
 		setPacientes([...pacientes, objetoPaciente]);
 
 		// Reiniciar el formulario
@@ -56,7 +63,9 @@ export const Formulario = ({ pacientes, setPacientes }) => {
 				className="bg-white shadow-md rounded-lg py-10 px-5 mb-10 mx-5"
 			>
 				{error ? (
-					<Error mensaje="Todos los campos son obligatorios"/>
+					<Error>
+						<p>Todos los campos son obligatorios</p>
+					</Error>
 				) : null}
 				<div className="mb-5">
 					<label
